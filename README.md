@@ -1,3 +1,27 @@
+# SupervisedChromeTrex
+Chrome Browser's TRex self playing AI via CNN neural network implemented in Keras + Theano + OpenCV
+
+Key Requirements:
+Python 2.7.13
+OpenCV 2.4.8
+Keras 2.0.2
+Theano 0.9.0
+
+Suggestion: Better to download Anaconda as it will take care of most of the other packages and easier to setup a virtual workspace to work with multiple versions of key packages like python, opencv etc.
+
+
+# Key repo contents
+- **main.py** : The main script launcher. This file contains all the code for UI options and OpenCV code to capture camera contents. This script internally calls interfaces to actionCNN.py.
+- **actionCNN.py** : This script file holds all the CNN specific code to create CNN model, load the weight file (if model is pretrained), train the model using image samples present in **./imgfolder**.
+- **imgfolder** : This folder contains all the 300 gameplay images I took in order to train the model. Only reason I had to provide images instead of weight file is GitHub's restriction for >100 MB file upload. **So in case you are trying to download/pull my repo then you must first train the model either using this imgfolder contents or your own.**
+
+# Usage
+```bash
+$ KERAS_BACKEND=theano python main.py 
+```
+We are setting KERAS_BACKEND to change backend to Theano, so in case you have already done it via Keras.json then no need to do that. But if you have Tensorflow set as default then this will be required.
+
+
 # What are we trying to achieve this time ?
 In this project I am using Supervised Machine Learning technique to teach our beloved TRex to play and then let it play the game itself!  Now keep in mind, I am not going after a perfect logic that will enable our TRex to play forever (that would be cheating right?).
  
