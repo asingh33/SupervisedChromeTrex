@@ -68,7 +68,7 @@ path = "./"
 ## Path2 is the folder which is fed in to training model
 path2 = './imgfolder'
 
-WeightFileName = ["newWeight.hdf5","consverativeWeight.hdf5"]
+WeightFileName = ["newWeight.hdf5","conservativeWeight.hdf5"]
 
 # outputs
 output = ["JUMP", "NOJUMP"]
