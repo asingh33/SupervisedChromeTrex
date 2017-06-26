@@ -10,6 +10,7 @@ from pynput import keyboard
 import actionCNN as myNN
 import time
 
+import threading
 
 class ScreenCapture(object):
   
@@ -112,6 +113,12 @@ def listen():
     listener.start()
 
 
+def kbAction(key):
+    if key == 0:
+        jump = ''' osascript -e 'tell application "System Events" to key code 126' '''
+        os.system(jump)
+
+
 def main():
     global isEscape, saveImg, sp, counter2
  
@@ -159,9 +166,9 @@ def main():
                 # to send keyboard keys to Chrome app.
                 # For Windows/Linux it will require some other way.
                 if retvalue == 0:
-                    jump = ''' osascript -e 'tell application "System Events" to key code 126' '''
-                    os.system(jump)
-                    #time.sleep(0.3)
+                    a = threading.Thread(target=kbAction, args = [retvalue])
+                    a.start()
+
                 lastAction = retvalue
             
             print myNN.output[retvalue]
