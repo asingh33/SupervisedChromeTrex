@@ -13,7 +13,7 @@ Suggestion: Better to download Anaconda as it will take care of most of the othe
 # Key repo contents
 - **main.py** : The main script launcher. This file contains all the code for UI options and OpenCV code to capture camera contents. This script internally calls interfaces to actionCNN.py.
 - **actionCNN.py** : This script file holds all the CNN specific code to create CNN model, load the weight file (if model is pretrained), train the model using image samples present in **./imgfolder**.
-- **imgfolder** : This folder contains all the 300 gameplay images I took in order to train the model. Only reason I had to provide images instead of weight file is GitHub's restriction for >100 MB file upload. **So in case you are trying to download/pull my repo then you must first train the model either using this imgfolder contents or your own.**
+- **imgfolder** : This folder contains all the 300 gameplay images I took in order to train the model.
 
 # Usage
 ```bash
