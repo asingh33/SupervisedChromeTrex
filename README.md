@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/91363258.svg)](https://zenodo.org/badge/latestdoi/91363258)
 # SupervisedChromeTrex
 Chrome Browser's TRex self playing AI via CNN neural network implemented in Keras + Theano + OpenCV
 
