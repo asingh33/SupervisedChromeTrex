@@ -71,3 +71,4 @@ Youtube link - https://youtu.be/ZZgvklkQrss
 
 
 This is still not perfect for instance, as you progress the TRex velocity increases and this also impacts the instance you need to make it jump. Current image samples don't handle this scenario. But like I said before, I am not looking for a perfect model. Perhaps if you are interested then you can perfect it, will be good exercise.
+
