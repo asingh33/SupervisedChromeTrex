@@ -13,7 +13,8 @@ from keras.utils import np_utils
 
 # We require this for Theano lib ONLY. Remove it for TensorFlow usage
 from keras import backend as K
-K.set_image_dim_ordering('th')
+#K.set_image_dim_ordering('th')
+K.set_image_data_format('channels_first')
 
 import numpy as np
 
@@ -26,13 +27,12 @@ from sklearn.model_selection import train_test_split
 import json
 
 import cv2
-import matplotlib
-
-from matplotlib import pyplot as plt
-
+#import matplotlib
+#from matplotlib import pyplot as plt
 
 # Get the output with maximum probability
 import operator
+import mychrome as chrome
 
 
 # input image dimensions
@@ -68,7 +68,7 @@ path = "./"
 ## Path2 is the folder which is fed in to training model
 path2 = './imgfolder'
 
-WeightFileName = ["newWeight.hdf5","conservativeWeight.hdf5"]
+WeightFileName = ["newWeight.hdf5"]
 
 # outputs
 output = ["JUMP", "NOJUMP"]
@@ -91,7 +91,6 @@ def loadCNN(wf_index):
     global get_output
     model = Sequential()
     
-    
     model.add(Conv2D(nb_filters, (nb_conv, nb_conv),
                         padding='valid',
                         input_shape=(img_channels, img_rows, img_cols)))
@@ -112,30 +111,23 @@ def loadCNN(wf_index):
     
     model.compile(loss='categorical_crossentropy', optimizer='adadelta', metrics=['accuracy'])
     
-    
     # Model summary
     model.summary()
     # Model conig details
     model.get_config()
     
-    from keras.utils import plot_model
-    plot_model(model, to_file='new_model.png', show_shapes = True)
-    
-
     if wf_index >= 0:
         #Load pretrained weights
         fname = WeightFileName[int(wf_index)]
-        print "loading ", fname
+        print("loading ", fname)
         model.load_weights(fname)
     
-    layer = model.layers[11]
+    layer = model.layers[-1]
     get_output = K.function([model.layers[0].input, K.learning_phase()], [layer.output,])
-    
-    
     return model
 
 # This function does the guessing work based on input images
-def guessAction(model, img):
+def guessAction(model, img, chromebrowser):
     global output, get_output
     
     #Flatten it
@@ -154,12 +146,13 @@ def guessAction(model, img):
     rimage = image.reshape(1, img_channels, img_rows, img_cols)
     
     # Now feed it to the NN, to fetch the predictions
+    #Method1-
     #index = model.predict_classes(rimage)
     #prob_array = model.predict_proba(rimage)
     
+    #Method2-
     prob_array = get_output([rimage, 0])[0]
 
-    
     d = {}
     i = 0
     for items in output:
@@ -167,12 +160,12 @@ def guessAction(model, img):
         i += 1
     
     # Get the output with maximum probability
-    guess = max(d.iteritems(), key=operator.itemgetter(1))[0]
+    guess = max(d.items(), key=operator.itemgetter(1))[0]
     prob  = d[guess]
-
-    if prob > 50.0:
-        return output.index(guess)
-
+    if prob > 60.0:
+        if guess == 'JUMP':
+            chrome.dinojump(chromebrowser)
+            return output.index(guess)
     else:
         return 1
 
@@ -185,18 +178,15 @@ def initializers():
     
     m,n = image1.shape[0:2] # get the size of the images
     total_images = len(imlist) # get the 'total' number of images
-    print m,n
+    print( m,n)
 
     
     # create matrix to store all flattened images
     immatrix = np.array([np.array((Image.open(path2+ '/' + images).resize((img_rows,img_cols))).convert('L')).flatten()
                          for images in imlist], dtype = 'f')
     
-    #immatrix = np.array([np.array(Image.open(path2+ '/' + images)).flatten()
-    #                     for images in imlist], dtype = 'f')
-    
-    print path2
-    print immatrix.shape
+    print(path2)
+    print(immatrix.shape)
     
     raw_input("Press any key")
     
@@ -258,7 +248,7 @@ def trainModel(model):
     hist = model.fit(X_train, Y_train, batch_size=batch_size, epochs=nb_epoch,
                  verbose=1, validation_split=0.2)
 
-    visualizeHis(hist)
+    
 
     ans = raw_input("Do you want to save the trained weights - y/n ?")
     if ans == 'y':
@@ -268,6 +258,7 @@ def trainModel(model):
     else:
         model.save_weights("newWeight.hdf5",overwrite=True)
 
+    visualizeHis(hist)
     # Save model as well
     # model.save("newModel.hdf5")
 #%%
@@ -302,87 +293,4 @@ def visualizeHis(hist):
     plt.legend(['train','val'],loc=4)
 
     plt.show()
-
-
-#%%
-def visualizeLayers(model, img, layerIndex):
-    imlist = modlistdir('./imgs')
-    if img <= len(imlist):
-        
-        image = np.array((Image.open('./imgs/' + imlist[img - 1]).resize((img_rows,img_cols))).convert('L')).flatten()
-        #image = np.array(Image.open('./imgs/' + imlist[img - 1])).flatten()
-        
-        
-        ## Predict
-        guessAction(model,image)
-        
-        # reshape it
-        image = image.reshape(img_channels, img_rows,img_cols)
-        
-        # float32
-        image = image.astype('float32')
-        
-        # normalize it
-        image = image / 255
-        
-        # reshape for NN
-        input_image = image.reshape(1, img_channels, img_rows, img_cols)
-    else:
-        X_train, X_test, Y_train, Y_test = initializers()
-        
-        # the input image
-        input_image = X_test[:img+1]
-    
-    
-    
-        
-    # visualizing intermediate layers
-    #output_layer = model.layers[layerIndex].output
-    #output_fn = theano.function([model.layers[0].input], output_layer)
-    #output_image = output_fn(input_image)
-    
-    if layerIndex >= 1:
-        visualizeLayer(model,img,input_image, layerIndex)
-    else:
-        tlayers = len(model.layers[:])
-        print "Total layers - {}".format(tlayers)
-        for i in range(1,tlayers):
-             visualizeLayer(model,img, input_image,i)
-
-#%%
-def visualizeLayer(model, img, input_image, layerIndex):
-
-    layer = model.layers[layerIndex]
-    
-    get_activations = K.function([model.layers[0].input, K.learning_phase()], [layer.output,])
-    activations = get_activations([input_image, 0])[0]
-    output_image = activations
-    
-    
-    ## If 4 dimensional then take the last dimension value as it would be no of filters
-    if output_image.ndim == 4:
-        # Rearrange dimension so we can plot the result
-        o1 = np.rollaxis(output_image, 3, 1)
-        output_image = np.rollaxis(o1, 3, 1)
-        
-        print "Dumping filter data of layer{} - {}".format(layerIndex,layer.__class__.__name__)
-        filters = len(output_image[0,0,0,:])
-        
-        fig=plt.figure(figsize=(8,8))
-        # This loop will plot the 32 filter data for the input image
-        for i in range(filters):
-            ax = fig.add_subplot(6, 6, i+1)
-            #ax.imshow(output_image[img,:,:,i],interpolation='none' ) #to see the first filter
-            ax.imshow(output_image[0,:,:,i],'gray')
-            #ax.set_title("Feature map of layer#{} \ncalled '{}' \nof type {} ".format(layerIndex,
-            #                layer.name,layer.__class__.__name__))
-            plt.xticks(np.array([]))
-            plt.yticks(np.array([]))
-        plt.tight_layout()
-        #plt.show()
-        fig.savefig("img_" + str(img) + "_layer" + str(layerIndex)+"_"+layer.__class__.__name__+".png")
-        #plt.close(fig)
-    else:
-        print "Can't dump data of this layer{}- {}".format(layerIndex, layer.__class__.__name__)
-
 
