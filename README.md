@@ -1,3 +1,9 @@
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/V7V01IK53)
+
+If you find my work useful, then please do consider supporting me. This will help me motivated and do more of such projects. 
+Thanks !
+
+
 [![DOI](https://zenodo.org/badge/91363258.svg)](https://zenodo.org/badge/latestdoi/91363258)
 # SupervisedChromeTrex
 Chrome Browser's TRex self playing AI via CNN neural network implemented in Keras + Theano + OpenCV
