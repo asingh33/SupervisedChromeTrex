@@ -4,6 +4,8 @@
 # SupervisedChromeTrex
 Chrome Browser's TRex self playing AI via CNN neural network implemented in Keras + Theano + OpenCV
 
+Blog: https://techkblog.com/teach-an-ai-to-play-game-using-supervised-learning/
+
 Key Requirements:
 Python 2.7.13
 OpenCV 2.4.8
